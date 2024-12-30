@@ -1,0 +1,175 @@
+Below is the English translation of your HTML template. The structure, Bootstrap classes, and JavaScript logic remain the same—only the text and comments have been translated.
+
+{% extends "base.html" %}
+
+{% block title %}
+Home - Retinopathy Analysis
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Left column -->
+    <div class="col-md-3" style="border-right:1px solid #ddd;">
+        <h4 class="mb-3">Upload Images or a Folder (zip)</h4>
+        <form
+          action="{{ url_for('upload') }}"
+          method="post"
+          enctype="multipart/form-data"
+          class="mb-4"
+        >
+            <div class="form-group">
+                <input type="file" name="files[]" multiple class="form-control-file">
+            </div>
+            <button type="submit" class="btn btn-primary">Upload</button>
+        </form>
+        <hr/>
+        <h5>Available Images</h5>
+        <div class="list-group">
+            {% for img in images %}
+            <button
+              class="list-group-item list-group-item-action"
+              onclick="selectImage('{{ img }}')"
+              id="item-{{ img }}"
+            >
+              {{ img }}
+            </button>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Center column: Visualization -->
+    <div class="col-md-6">
+        <h4 class="text-center">Visualization Area</h4>
+        <!-- Main content (single or split view) -->
+        <div id="visual-container" class="d-flex justify-content-center">
+            <!-- By default, display a single image -->
+            <img id="selected-image" src="" alt="Preview" style="max-width:90%; border:2px solid #555;">
+        </div>
+        <!-- When showing attention, two images side by side: original + overlay -->
+        <div id="attention-container" class="d-none mt-3" style="justify-content:center;">
+            <div class="mr-3">
+                <h6>Original Image</h6>
+                <img id="original-image-attn" src="" alt="Original" style="max-width:100%; border:1px solid #ccc;">
+            </div>
+            <div>
+                <h6>Attention</h6>
+                <img id="attention-image" src="" alt="Attention Map" style="max-width:100%; border:1px solid #ccc;">
+            </div>
+        </div>
+    </div>
+
+    <!-- Right column: Results / Actions -->
+    <div class="col-md-3">
+        <h4>Information</h4>
+        <p><strong>Predicted Class:</strong> <span id="predicted-class">-</span></p>
+        <p><strong>Probability:</strong> <span id="predicted-prob">-</span></p>
+        <hr>
+        <button class="btn btn-info mb-2" onclick="showAttention()">Visualize Attention</button>
+        <button class="btn btn-secondary mb-2" onclick="segment()">Segment (SAM)</button>
+        <hr>
+        <div id="advanced-link" class="mt-2 d-none">
+            <a id="adv-link" href="#" class="btn btn-outline-primary" target="_blank">
+                View Layer-wise Attention
+            </a>
+        </div>
+        <hr>
+        <h5>Segmentation (SAM)</h5>
+        <img
+          id="segmented-image"
+          src=""
+          alt="Segmentation"
+          style="display:none; max-width:100%; border:1px solid #999;"
+        >
+    </div>
+</div>
+
+<script>
+    let currentImageName = "";
+
+    function selectImage(imgName) {
+      currentImageName = imgName;
+
+      // Remove visual selection
+      document.querySelectorAll(".list-group-item").forEach(item => {
+        item.classList.remove("active");
+      });
+      // Highlight the clicked item
+      document.getElementById("item-" + imgName).classList.add("active");
+
+      // Reset to single-image view
+      document.getElementById("visual-container").classList.remove("d-none");
+      document.getElementById("attention-container").classList.add("d-none");
+
+      // Reset displays
+      document.getElementById("selected-image").src = "/static/images/" + imgName;
+      document.getElementById("original-image-attn").src = "";
+      document.getElementById("attention-image").src = "";
+
+      document.getElementById("segmented-image").style.display = "none";
+      document.getElementById("predicted-class").textContent = "-";
+      document.getElementById("predicted-prob").textContent = "-";
+
+      document.getElementById("adv-link").href = "#";
+      document.getElementById("advanced-link").classList.add("d-none");
+
+      // Trigger prediction
+      fetch("/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image_name: currentImageName })
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("predicted-class").textContent = data.predicted_class;
+        document.getElementById("predicted-prob").textContent = data.probability;
+      })
+      .catch(err => console.error(err));
+    }
+
+    function showAttention() {
+      if(!currentImageName) return;
+
+      fetch("/attention", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image_name: currentImageName })
+      })
+      .then(res => res.json())
+      .then(data => {
+        // Switch to split view (two images)
+        document.getElementById("visual-container").classList.add("d-none");
+        document.getElementById("attention-container").classList.remove("d-none");
+
+        document.getElementById("original-image-attn").src = "/static/images/" + currentImageName;
+        document.getElementById("attention-image").src = data.attention_image_url;
+
+        // Show advanced link
+        document.getElementById("adv-link").href = "/advanced_attention/" + currentImageName;
+        document.getElementById("advanced-link").classList.remove("d-none");
+      })
+      .catch(err => console.error(err));
+    }
+
+    function segment() {
+      if(!currentImageName) return;
+
+      fetch("/segment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image_name: currentImageName })
+      })
+      .then(res => {
+        if(!res.ok) {
+          throw new Error("Segmentation Error");
+        }
+        return res.json();
+      })
+      .then(data => {
+        const segImg = document.getElementById("segmented-image");
+        segImg.src = data.segmented_image_url;
+        segImg.style.display = "block";
+      })
+      .catch(err => console.error(err));
+    }
+</script>
+{% endblock %}

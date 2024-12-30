@@ -1,0 +1,139 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+  }
+  
+  header {
+    padding: 1rem;
+    background: #2d3e50;
+    color: white;
+  }
+  
+  header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+  
+  main {
+    display: flex;
+    flex-direction: row;
+    height: calc(100vh - 60px);
+  }
+  
+  .sidebar-left {
+    width: 20%;
+    background: #fff;
+    padding: 1rem;
+    overflow-y: auto;
+    border-right: 1px solid #ccc;
+  }
+  
+  .sidebar-right {
+    width: 20%;
+    background: #fff;
+    padding: 1rem;
+    border-left: 1px solid #ccc;
+    overflow-y: auto;
+  }
+  
+  .main-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: auto;
+    background: #fff;
+  }
+  
+  .image-item {
+    border: 1px solid transparent;
+    margin-bottom: 10px;
+    padding: 5px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .image-item img {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  .image-item.selected {
+    border-color: #2d3e50;
+  }
+  
+  .image-preview img {
+    max-width: 90%;
+    max-height: 80vh;
+    border: 2px solid #2d3e50;
+  }
+  
+  button {
+    background: #2d3e50;
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    margin: 0.5rem 0;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background: #44576b;
+  }
+  
+  hr {
+    margin: 1rem 0;
+  }
+
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.sidebar-left, .sidebar-right {
+    flex: 1;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.main {
+    flex: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.image-container {
+    max-width: 90%;
+    max-height: 90%;
+    overflow: hidden;
+    background-color: #f5f5f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.image-container img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}

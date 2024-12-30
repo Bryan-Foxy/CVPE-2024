@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}
+Visualisation Avancée - Analyse Rétinopathie
+{% endblock %}
+
+{% block content %}
+<header>
+    <h1>Visualisation Avancée - Cartes d'Attention</h1>
+</header>
+
+<div class="main">
+    <h2>Image Originale</h2>
+    <div class="image-container">
+        <img src="{{ url_for('static', filename='images/' ~ original_image) }}" alt="Original">
+    </div>
+    <hr>
+    <h2>Layer-wise Attention</h2>
+    <p>(Montage des différentes couches)</p>
+    <div class="image-container">
+        <img src="{{ attention_layers_image }}" alt="Toutes les couches d'attention">
+    </div>
+</div>
+{% endblock %}
